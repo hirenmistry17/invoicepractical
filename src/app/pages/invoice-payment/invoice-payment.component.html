@@ -1,0 +1,193 @@
+<div class="container">
+
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Invoice Payment</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="content">
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+
+    <div class="container-fluid" *ngIf="!isLoading">
+      <form [formGroup]="form" (ngSubmit)="onSubmit(form!.valid,form.value)">
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Invoice Number
+              </label>
+            </div>
+            <div class="col-md-8">
+              <mat-form-field class="form-element" appearance="fill">
+                <input matInput placeholder="Number" type="number" formControlName="invnumber">
+              </mat-form-field>
+              <div [hidden]="form.get('invnumber')!.valid || (form.get('invnumber')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('invnumber')!.hasError('required')" class="error-label">
+                  invnumber is Required
+                </small>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Bill Address
+              </label>
+            </div>
+            <div class="col-md-8">
+              <mat-form-field class="form-element" appearance="fill">
+                <textarea matInput placeholder="Address" formControlName="billaddress">
+                  </textarea>
+              </mat-form-field>
+              <div [hidden]="form.get('billaddress')!.valid || (form.get('billaddress')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('billaddress')!.hasError('required')" class="error-label">
+                  billaddress is Required
+                </small>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Shipping Address
+              </label>
+            </div>
+            <div class="col-md-8">
+
+              <mat-form-field class="form-element" appearance="fill">
+                <textarea matInput placeholder="Address" formControlName="shippingaddress">
+                </textarea>
+              </mat-form-field>
+              <div
+                [hidden]="form.get('shippingaddress')!.valid || (form.get('shippingaddress')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('shippingaddress')!.hasError('required')" class="error-label">
+                  shippingaddress is Required
+                </small>
+              </div>
+            </div>
+
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Total Amount
+              </label>
+            </div>
+            <div class="col-md-8">
+
+              <mat-form-field class="form-element" appearance="fill">
+                <input matInput placeholder="Number" type="number" formControlName="totalamount">
+              </mat-form-field>
+            </div>
+
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Card Number
+              </label>
+            </div>
+            <div class="col-md-8">
+
+              <mat-form-field class="form-element" appearance="fill">
+                <input matInput placeholder="Number" type="number" formControlName="cardnumber">
+              </mat-form-field>
+              <div [hidden]="form.get('cardnumber')!.valid || (form.get('cardnumber')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('cardnumber')!.hasError('required')" class="error-label">
+                  cardnumber is Required
+                </small>
+              </div>
+            </div>
+
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                CVV
+              </label>
+            </div>
+            <div class="col-md-8">
+
+              <mat-form-field class="form-element" appearance="fill">
+                <input matInput placeholder="Number" type="number" formControlName="cvv">
+              </mat-form-field>
+              <div [hidden]="form.get('cvv')!.valid || (form.get('cvv')!.pristine && !submitted)" class="text-danger">
+                <small *ngIf="form.get('cvv')!.hasError('required')" class="error-label">
+                  cvv is Required
+                </small>
+                <small
+                  *ngIf="form.get('cvv')!.hasError('insertonlypositivenumber') || form.get('cvv')!.hasError('insertonlythreenumber')"
+                  class="error-label">
+                  cvv is invalid
+                </small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Expiry Date
+              </label>
+            </div>
+            <div class="col-md-8">
+               <mat-form-field>
+                <input matInput [matDatepicker]="picker" formControlName="expirydate" [min]="today">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker startView="multi-year" (monthSelected)="monthSelected($event)">
+                </mat-datepicker>
+            </mat-form-field>
+
+              <div [hidden]="form.get('expirydate')!.valid || (form.get('expirydate')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('expirydate')!.hasError('required')" class="error-label">
+                  expirydate is Required
+                </small>
+              </div>
+            </div>
+
+
+            <div class="col-md-4">
+              <label class="col-form-label">
+                Holder Name
+              </label>
+            </div>
+            <div class="col-md-8">
+
+              <mat-form-field class="form-element" appearance="fill">
+                <input matInput placeholder="ex. Jhon doe" type="text" formControlName="holdername">
+
+              </mat-form-field>
+              <div [hidden]="form.get('holdername')!.valid || (form.get('holdername')!.pristine && !submitted)"
+                class="text-danger">
+                <small *ngIf="form.get('holdername')!.hasError('required')" class="error-label">
+                  holdername is Required
+                </small>
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-right">
+
+            <button type="button" class="btn btn-secondary" style="margin: 6px;" [disabled]="disableBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="disableBtn">Make Payment</button>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>

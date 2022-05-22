@@ -1,0 +1,185 @@
+<div class="container">
+
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Invoice</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="content">
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+         
+    <div class="container-fluid" *ngIf="!isLoading"> 
+
+      <div class="row">
+        <div class="col-md-12 text-right" style="margin: 10px">
+          <button type="button" class="btn btn-primary text-right" data-toggle="modal" data-target="#exampleModal">
+                New Invoice
+          </button>
+
+        </div>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Billing Address</th>
+            <th scope="col">Shipping Address</th>
+            <th scope="col">Total Amount</th>
+            <th scope="col" style="text-align: end;">
+              <span >Action</span>
+            </th>
+          </tr> 
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of List ;let i = index">
+            <td >{{item.invnumber}}</td>
+            <td>{{item.billaddress}}</td>
+            <td>{{item.shippingaddress}}</td>
+            <td>{{item?.totalamount}}</td>
+            <td class="text-right" >
+              <ng-container *ngIf="item.status == 'Unpaid';else prewBtn">
+                  <a  [class.disabled]="disableBtn" style="cursor: pointer;"  (click)="updateStatus(item)"> 
+                    <mat-icon aria-hidden="false" aria-label="Example home icon">payment</mat-icon>
+                  </a>
+               </ng-container>
+              <ng-template #prewBtn>
+                   <a  [class.disabled]="disableBtn" style="cursor: pointer;"  (click)="previewBtn(item)"> 
+                  <mat-icon aria-hidden="false" aria-label="Example home icon">pageview</mat-icon>
+                </a>  
+               </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document" *ngIf="form">
+      <form [formGroup]="form" (ngSubmit)="onSubmit(form!.valid,form.value)">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Make Invoice </h5>
+            <button type="button" class="close" id="closeid" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-4">
+                  <label class="col-form-label">
+                    Invoice Number
+                  </label>
+                </div>
+                <div class="col-md-8">
+                  <mat-form-field class="form-element" appearance="fill">
+                    <input matInput placeholder="Number" type="number" formControlName="invnumber">
+                  </mat-form-field>
+                  <div [hidden]="form.get('invnumber')!.valid || (form.get('invnumber')!.pristine && !submitted)"
+                    class="text-danger">
+                    <small *ngIf="form.get('invnumber')!.hasError('required')"
+                        class="error-label">
+                        invnumber is Required
+                      </small>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="col-form-label">
+                    Bill Address
+                  </label>
+                </div>
+                <div class="col-md-8">
+                  <mat-form-field class="form-element" appearance="fill">
+                    <textarea matInput placeholder="Address" formControlName="billaddress">
+                  </textarea>
+                  </mat-form-field>
+                  <div [hidden]="form.get('billaddress')!.valid || (form.get('billaddress')!.pristine && !submitted)"
+                    class="text-danger">
+                    <small *ngIf="form.get('billaddress')!.hasError('required')"
+                        class="error-label">
+                        billaddress is Required
+                      </small>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="col-form-label">
+                    Shipping Address
+                  </label>
+                </div>
+                <div class="col-md-8">
+
+                  <mat-form-field class="form-element" appearance="fill">
+                    <textarea matInput placeholder="Address" formControlName="shippingaddress">
+                </textarea>
+                  </mat-form-field>
+                  <div [hidden]="form.get('shippingaddress')!.valid || (form.get('shippingaddress')!.pristine && !submitted)"
+                  class="text-danger">
+                  <small *ngIf="form.get('shippingaddress')!.hasError('required')"
+                      class="error-label">
+                      shippingaddress is Required
+                    </small>
+                </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="col-form-label">
+                    Products
+                  </label>
+                </div>
+                <div class="col-md-8">
+                  <mat-form-field appearance="fill" *ngIf="productList">
+                    <mat-label>Select an option</mat-label>
+                    <mat-select multiple formControlName="products">
+                      <mat-option *ngFor="let item of productList" [value]="item">{{item?.title}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="col-md-4" *ngIf="selectedProduct && selectedProduct.length > 0">
+                  <label class="col-form-label">
+                    Choosed Products
+                  </label>
+                </div>
+                <div class="col-md-8">
+                  <ng-container *ngFor="let product of selectedProduct">
+                    <div>{{product?.title}}
+                      <mat-form-field class="form-element" appearance="fill">
+                        <input matInput type="number" placeholder="Qty" [ngModelOptions]="{standalone: true}"
+                          [(ngModel)]="product.qty">
+                      </mat-form-field>
+                    </div>
+                  </ng-container>
+                  <span></span>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" [disabled]="disableBtn" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="disableBtn">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
